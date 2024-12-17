@@ -75,10 +75,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         placeholder="Enter your password" 
                         required
                     >
-                    <a href="forgotpass.html" 
-                        class="inline-block mt-2 text-sm text-indigo-800 hover:text-blue-900 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors duration-300">
-                        Forgot Password?
-                    </a>
                 </div>
 
                 <div class="flex items-center justify-between">

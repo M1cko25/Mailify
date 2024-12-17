@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('Asia/Manila');
 session_start();
 if (!isset($_SESSION['email'])) {
     header("Location: login.php");
@@ -8,12 +9,11 @@ require_once("database.php");
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
-
-$stmt = $conn->prepare("SELECT * FROM mails WHERE user_id = ? OR user_email = ?");
-$stmt->bind_param("ss", $_SESSION['user_id'], $_SESSION['email']);
+$date = isset($_GET['date']) ? $_GET['date'] : date("Y-m-d", time());
+$stmt = $conn->prepare("SELECT * FROM mails WHERE user_id = ? OR user_email = ? AND receive_date = ?");
+$stmt->bind_param("sss", $_SESSION['user_id'], $_SESSION['email'], $date);
 $stmt->execute();
 $result = $stmt->get_result();
-
 
 ?>
 
@@ -45,17 +45,8 @@ $result = $stmt->get_result();
                             <path d="M200-280q-17 0-28.5-11.5T160-320v-80H80v-160h80v-80q0-17 11.5-28.5T200-680h640q17 0 28.5 11.5T880-640v320q0 17-11.5 28.5T840-280H200Z"/>
                         </svg>
                     </span>
-            </li>
-                <!-- <li class="flex justify-center items-center">
-                    <button>
-                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff">
-                            <path d="M160-200v-80h80v-280q0-83 50-147.5T420-792v-28q0-25 17.5-42.5T480-880q25 0 42.5 17.5T540-820v28q80 20 130 84.5T720-560v280h80v80H160Zm320-300Zm0 420q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80ZM320-280h320v-280q0-66-47-113t-113-47q-66 0-113 47t-47 113v280Z"/>
-                        </svg>
-                    </button>
-                    <?php //if ($notifNum > 0) : ?>
-                    <div class="absolute cursor-default bg-red-600 md:w-5 md:h-5 w-3 h-3 text-xs rounded-full lg:translate-x-3 lg:-translate-y-2 translate-x-4 -translate-y-3 flex justify-center items-center text-white"><?php echo $notifNum ?></div>
-                    <?php //endif; ?> 
-                </li> -->
+                </li>
+                
                 <div class="flex row flex justify-center items-center">
                     <li><button class="md:w-7 md:h-7 w-5 h-5 bg-gray-400 rounded-full text-white"><span><?php echo strtoupper(substr($_SESSION['username'] ,0, 1)) ?></span></button></li>
                     <li><button onclick="toggleLogout()"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M480-360 280-560h400L480-360Z"/></svg></button></li>
@@ -76,6 +67,12 @@ $result = $stmt->get_result();
             </div>
         </div>
         <div class="w-full md:p-8 p-3 flex flex-col justify-center rounded-lg items-center gap-5">
+            <div class="w-1/2">
+                <form id="group" action="" method="get" class="flex row gap-2 justify-start items-center">
+                    <label for="date">Group By:</label>
+                    <input class="border border-black rounded md:p-2 p-0" type="date" name="date" onchange="groupSubmit()" id="date" value="<?php echo $date;?>"/>
+                </form>
+            </div>
             <table class="w-full rounded-lg shadow-lg">
                 <tr class="w-full lg:text-lg text-sm bg-gray-200 ">
                     <th>Mail Id</th>
@@ -107,6 +104,11 @@ $result = $stmt->get_result();
             } else {
                 logoutBox.style.display = "block";
             }
+        }
+
+        function groupSubmit() {
+            let form = document.querySelector('#group');
+            form.submit();
         }
     </script>
 </body>

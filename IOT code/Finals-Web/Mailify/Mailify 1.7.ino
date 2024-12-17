@@ -6,7 +6,7 @@ long duration;
 int distance;
 #define TRIG_PIN 14
 #define ECHO_PIN 12
-const char* serverUrl = "http://192.168.1.118:5500/notify.php";
+const char* serverUrl = "http://192.168.1.7:5500/notify.php";
 WiFiClient wifiClient;
 bool hasMail = false;
 void setup() {
@@ -46,8 +46,7 @@ void loop() {
     hasMail = true;
     delay(20000);
   } 
-  else if (distance > 200 && hasMail) { 
-      // Reset hasMail only if the mail is clearly removed (distance > 200 cm)
+  else if ((distance >= 23 && distance <= 26) && hasMail) { 
       Serial.println("Mail removed. Ready to detect again.");
       hasMail = false;
   }

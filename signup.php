@@ -6,7 +6,8 @@ if (isset($_SESSION['email'])) {
     header("Location: index.php");
     exit();
 }
-if (isset($_POST['submit'])) {
+$error = "";
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$conn) {
         die("Connection failed: " . mysqli_connect_error());
     }
@@ -19,7 +20,7 @@ if (isset($_POST['submit'])) {
     $stmt->execute();
     $result = $stmt->get_result();
     if (mysqli_num_rows($result) > 0) {
-        echo "Email already exists. Please use a different email.";
+        $error = "Email already exists. Please use a different email.";
     } else {
         $stmt = $conn->prepare("INSERT INTO users (username, email, password, MailBox) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("ssss", $username, $email, $password, $mailbox);
@@ -113,8 +114,6 @@ if (isset($_POST['submit'])) {
             </div>
 
             <button 
-                type="submit" 
-                name="submit"
                 class="w-full bg-indigo-800 text-white py-3 rounded-lg font-semibold hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-800 focus:ring-offset-2 transition-all duration-300 transform hover:scale-[1.02]"
             >
                 Register
@@ -139,6 +138,7 @@ if (isset($_POST['submit'])) {
 
     <script>
         document.getElementById('registrationForm').addEventListener('submit', function(event) {
+            event.preventDefault();
             // Clear previous error messages
             document.querySelectorAll('.text-red-500').forEach(function(element) {
                 element.classList.add('hidden');
@@ -181,9 +181,9 @@ if (isset($_POST['submit'])) {
                 document.getElementById('confirmPasswordError').classList.remove('hidden');
                 isValid = false;
             }
-            if (password.length < 6) {
+            if (password.length < 8) {
                 document.getElementById('passwordError').classList.remove('hidden');
-                document.getElementById('passwordError').textContent = 'Password must be at least 6 characters.';
+                document.getElementById('passwordError').textContent = 'Password must be at least 8 characters.';
                 isValid = false;
             }
             if (isValid) {
